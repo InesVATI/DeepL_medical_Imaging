@@ -36,12 +36,13 @@ def label_data(nb, ray=0.1, perm=1000.0):
     
     
     delta_perm = mesh_new["perm"] - mesh_obj["perm"]
-    im=ax.tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
+    ax.tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
     ax.set_aspect("equal")
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False) 
     plt.tick_params(axis='y', which='both', right=False, left=False, labelleft=False)
     ax.set_facecolor("black")
-    fig.savefig('labeled_data/'+str(nb)+'_conductivity_img.jpg')
+    plt.savefig('labeled_data/'+str(nb)+'_conductivity_img.jpg')
+    plt.close() #prevent the figure from being plotted
     
     """ 2. FEM forward simulations """
     # setup EIT scan conditions
@@ -70,7 +71,7 @@ def generation():
         for p in perm:
             nb += 1
             label_data(nb, ray=r, perm=p)
-            return 0
+
     
 
 
