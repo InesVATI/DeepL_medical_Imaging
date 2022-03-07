@@ -57,31 +57,18 @@ def label_data(nb, ray=0.1, perm=1000.0):
 
     np.save('labeled_data/'+str(nb)+'_voltage_border',f1.v - f0.v)
 
-
+#Test
 #V= np.load('labeled_data/0_voltage_border.npy')
-#print(V.shape)
+#print('TEST: ', V.shape)
 
-# """ 0. Construction du maillage """
-# # Mesh shape is specified with fd parameter in the instantiation, e.g : fd=thorax , Default :fd=circle
-# mesh_obj, el_pos = mesh.create(16, h0=0.1, fd=thorax) # La conductivite est egale a 1 partout, par defaut
-# # mesh_obj, el_pos = mesh.layer_circle()
+#loop
+ray = np.linspace(0.05, 0.4, 1000)
+perm = np.linspace(200, 5000, 10000)
+def generation(ray, perm):
+    nb=0
+    for r in ray:
+        for p in perm:
+            nb += 1
+            label_data(nb, ray=r, perm=p)
 
-# # extract node, element, alpha
-# pts = mesh_obj["node"]  # Tableau de points qui constituent la discretisation du domaine
-# tri = mesh_obj["element"] # Tableau de triangles. Un triangle = 1 tableau qui contient 3 indices qui identifient les points
-# x, y = pts[:, 0], pts[:, 1]
-
-# """ 1. Ajout d'une anomalie de conductivite egale a 1000 a point 0.5,0.5 avec un rayon de 0.1 """
-# anomaly = [{"x": 0.5, "y": 0.5, "d": 0.1, "perm": 1000.0}, {"x": -0.2, "y": -0.2, "d": 0.2, "perm": 100.0}]
-# mesh_new = mesh.set_perm(mesh_obj, anomaly=anomaly)
-
-# fig, axes = plt.subplots(1, constrained_layout=True)
-# fig.set_size_inches(6, 4)
-
-# ax = axes
-# ax.set_facecolor("black")
-# delta_perm = mesh_new["perm"] - mesh_obj["perm"]
-# im = ax.tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
-# ax.set_aspect("equal")
-# plt.show()
 
