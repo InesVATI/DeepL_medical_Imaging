@@ -36,7 +36,7 @@ def label_data(nb, ray=0.1, perm=1000.0):
     
     
     delta_perm = mesh_new["perm"] - mesh_obj["perm"]
-    ax.tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
+    im=ax.tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
     ax.set_aspect("equal")
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False) 
     plt.tick_params(axis='y', which='both', right=False, left=False, labelleft=False)
@@ -64,11 +64,13 @@ def label_data(nb, ray=0.1, perm=1000.0):
 #loop
 ray = np.linspace(0.05, 0.4, 1000)
 perm = np.linspace(200, 5000, 10000)
-def generation(ray, perm):
+def generation():
     nb=0
     for r in ray:
         for p in perm:
             nb += 1
             label_data(nb, ray=r, perm=p)
+            return 0
+    
 
 
