@@ -61,9 +61,9 @@ def label_data_rand(num, nb_px = 128, plot=False):
     
     #set the parameters of the random anomaly
     ray = (0.7-0.04)*rd.random() + 0.04 #RAY randomly between 0.04 and 0.7 
-    print('ray is ', ray)
+    #print('ray is ', ray)
     perm = (60000- 500)*rd.random() + 500
-    print('perm is ', perm)
+    #print('perm is ', perm)
     #x in [-1, 1] , y in [-0.6, 0.6]
     ano_x, ano_y = 2*rd.random() -1, 1.2*rd.random()- 0.6
     
