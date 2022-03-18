@@ -48,42 +48,26 @@ def isintriangle(p1, p2, p3, p):
     
     return True
           
+def generate_array(nb_px, x, y, tri, delta_perm, test=False):
+    """  Save the array of shape (nb_px, nb_px) containing the conductivity 
+    from the caracteristics of the mesh 
+    
+    Params
+    ---------
+    nb_px: iny, number of pixel
+    x, y: array of shape (number of mesh's points, 1), stores the x-coordinate (respectively y-coordinate) of each point of the mesh
+    tri: array of shape (number of triangles, 3), stores  the 3 vertices of each triangle
 
-def label_data_rand(num, nb_px = 128, plot=False):
-    """"
-    Compute and save the conductivity map and the voltage at the borders
-    Params:
-    -----------
-    num: int used for the name of the file
-    nb_px: int 
+    test: bool, If True it plots the conductivity map and the triangulation image   
+    
+    Returns
+    ---------
+    array of shape (nb_px, nb_px)
     
     """
     
-    #set the parameters of the random anomaly
-    ray = (0.7-0.04)*rd.random() + 0.04 #RAY randomly between 0.04 and 0.7 
-    #print('ray is ', ray)
-    perm = (60000- 500)*rd.random() + 500
-    #print('perm is ', perm)
-    #x in [-1, 1] , y in [-0.6, 0.6]
-    ano_x, ano_y = 2*rd.random() -1, 1.2*rd.random()- 0.6
-    
-    #conductivity is equal to 1 every where
-    mesh_obj, el_pos = mesh.create(16, h0=0.1, fd=thorax)
-    # extract node, element, alpha
-    pts = mesh_obj["node"]  # array of coordinates (x,y) for each mesh's point 
-    #For each triangle, the indices of the three points that make up the triangle, ordered in an anticlockwise manner.
-    tri = mesh_obj["element"]
-    x, y = pts[:, 0], pts[:, 1]
-    
-    #add one random anomaly 
-    anomaly = [{"x": ano_x, "y": ano_y, "d": ray, "perm": perm}]
-    mesh_new = mesh.set_perm(mesh_obj, anomaly=anomaly)
-    
-    delta_perm = mesh_new["perm"] - mesh_obj["perm"] #match each triangle to a conductivity value
-    
-    """ 1. Save the array containing the conductivity """
-    cond_img = np.zeros((nb_px, nb_px))
-    
+    cond_img = -5000*np.ones((nb_px, nb_px))
+
     #graduation for pixelization of the image
     xmin, xmax = np.min(x), np.max(x)
     ymin, ymax = np.min(y), np.max(y)
@@ -95,7 +79,7 @@ def label_data_rand(num, nb_px = 128, plot=False):
             
             # the pixel take the value of the conductivity of the triangle 
             #in which its center is 
-            center = [(2*xmin + (2*i +1)*grad_x)/2, (2*ymin + (2*j +1)*grad_y)/2]
+            center = [(2*xmin + (2*j +1)*grad_x)/2, (2*ymax + (-2*i +1)*grad_y)/2]
             for k in range (tri.shape[0]):
                 p1 = [x[tri[k, 0]], y[tri[k,0]]]
                 p2 = [x[tri[k, 1]], y[tri[k,1]]]
@@ -103,17 +87,60 @@ def label_data_rand(num, nb_px = 128, plot=False):
                 
                 if isintriangle(p1, p2, p3, center):
                     cond_img[i,j] = delta_perm[k]
-                    break 
-
-    if plot:
-        fig, ax = plt.subplots(1, constrained_layout=True)
+                    break
+                
+    if test:
+        fig, ax = plt.subplots(1,2, constrained_layout=True)
         fig.set_size_inches(6, 4)
         
-        ax.tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
-        ax.set_aspect("equal")
-        plt.show()
+        im=ax[0].tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
+        ax[0].set_aspect("equal")
+        ax[0].set_title('image from triangulation')
+        fig.colorbar(im, ax=ax[0])
         
-    #return cond_img
+        im_arr = ax[1].imshow(cond_img)
+        ax[1].set_title('conductivity map')
+        fig.colorbar(im_arr, ax=ax[1])
+        plt.show()
+                
+    return cond_img
+
+def label_data_rand(num, nb_px = 128, test=False):
+    """"
+    Compute and save the conductivity map and the voltage at the borders
+    For one anomaly that is randomly generated
+    
+    Params:
+    -----------
+    num: int used for the name of the file
+    nb_px: int 
+    
+    """
+    
+    #set the parameters of the random anomaly
+    ray = (0.7-0.05)*rd.random() + 0.05 #RAY randomly between 0.04 and 0.7 
+
+    perm = (60000- 500)*rd.random() + 500
+
+    
+    #conductivity is equal to 1 every where
+    mesh_obj, el_pos = mesh.create(16, h0=0.1, fd=thorax)
+    # extract node, element, alpha
+    pts = mesh_obj["node"]  # array of coordinates (x,y) for each mesh's point 
+    #For each triangle, the indices of the three points that make up the triangle, ordered in an anticlockwise manner.
+    tri = mesh_obj["element"]
+    x, y = pts[:, 0], pts[:, 1]
+    
+    ano_x, ano_y = (np.max(x)-np.min(x))*rd.random() + np.min(x), (np.max(y) - np.min(y))*rd.random()+ np.min(y)
+
+    #add one random anomaly 
+    anomaly = [{"x": ano_x, "y": ano_y, "d": ray, "perm": perm}]
+    mesh_new = mesh.set_perm(mesh_obj, anomaly=anomaly)
+    
+    delta_perm = mesh_new["perm"] - mesh_obj["perm"] #match each triangle to a conductivity value
+    
+    """ 1. Save the array containing the conductivity """
+    cond_img = generate_array(nb_px, x, y, tri, delta_perm, test)
     np.save('labeled_data/'+str(num)+'_cond_img', cond_img)
     
     """ 2. FEM forward simulations """
@@ -129,7 +156,48 @@ def label_data_rand(num, nb_px = 128, plot=False):
 
     np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
     
+def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
+    """
+    Labelization of data 
+    --------------------
+    Parameters: 
+        num: int, numerotation of the generated data, it is used in the file names 
+        ray: float, the ray of the simulated anomaly 
+        
+    """
+    #conductivity is equal to 1 every where
+    mesh_obj, el_pos = mesh.create(16, h0=0.1, fd=thorax)
 
+    # extract node, element, alpha
+    pts = mesh_obj["node"]  # Tableau de points qui constituent la discretisation du domaine
+    #For each triangle, the indices of the three points that make up the triangle, ordered in an anticlockwise manner.
+    tri = mesh_obj["element"] # Tableau de triangles. Un triangle = 1 tableau qui contient 3 indices qui identifient les points
+    x, y = pts[:, 0], pts[:, 1]
+    
+    #add almost-symmetrical anomaly
+    anomaly = [{"x": -0.25, "y": 0.0, "d": ray, "perm": perm},{"x": 0.5, "y": 0.0, "d": ray, "perm": perm}]
+    mesh_new = mesh.set_perm(mesh_obj, anomaly=anomaly)
+    delta_perm = mesh_new["perm"] - mesh_obj["perm"] 
+    
+    """ 1. Save the array containing the conductivity """
+    cond_img = generate_array(nb_px, x, y, tri, delta_perm, test=test)
+    np.save('labeled_data/'+str(num)+'_cond_img', cond_img)
+    
+    """ 2. FEM forward simulations """
+    # setup EIT scan conditions
+    # adjacent stimulation (el_dist=1), adjacent measures (step=1)
+    el_dist, step = 1, 1
+    ex_mat = eit_scan_lines(16, el_dist)
+    
+    # calculate simulated data
+    fwd = Forward(mesh_obj, el_pos)
+    f0 = fwd.solve_eit(ex_mat, step=step, perm=mesh_obj["perm"])
+    f1 = fwd.solve_eit(ex_mat, step=step, perm=mesh_new["perm"])
+
+    np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
 
 def test(num=0):
-    label_data_rand(num)
+    label_data_rand(num, test=True)
+    #label_data_sym(num, test=True)
+    
+    
