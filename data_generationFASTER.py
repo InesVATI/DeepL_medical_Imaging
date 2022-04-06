@@ -112,21 +112,26 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
         p2 = [x[tri[indice_triangle, 1]] + abs(xmin), y[tri[indice_triangle,1]] + abs(ymin)] 
         p3 = [x[tri[indice_triangle, 2]] + abs(xmin), y[tri[indice_triangle,2]] + abs(ymin)] 
         
-        p1_small = [p1[0]/grad_x,p1[1]/grad_y]
-        p2_small = [p2[0]/grad_x,p2[1]/grad_y]
-        p3_small = [p3[0]/grad_x,p3[1]/grad_y]
+        p1_small = [p1[1]/grad_y,p1[0]/grad_x]#[p1[0]/grad_x,p1[1]/grad_y]
+        p2_small = [p2[1]/grad_y,p2[0]/grad_x] #[p2[0]/grad_x,p2[1]/grad_y]
+        p3_small = [p3[1]/grad_y,p3[0]/grad_x] #[p3[0]/grad_x,p3[1]/grad_y]
         
-        x_min = math.floor(min(p1_small[0],p2_small[0],p3_small[0]))
-        y_min = math.floor(min(p1_small[1],p2_small[1],p3_small[1]))
-        x_max = math.ceil(max(p1_small[0],p2_small[0],p3_small[0]))
-        y_max = math.ceil(max(p1_small[1],p2_small[1],p3_small[1]))
+        #x_min = math.floor(min(p1_small[0],p2_small[0],p3_small[0]))
+        x_min = math.floor(min(p1_small[1],p2_small[1],p3_small[1]))
+        #y_min = math.floor(min(p1_small[1],p2_small[1],p3_small[1]))
+        y_min = math.floor(min(p1_small[0],p2_small[0],p3_small[0]))
+        #x_max = math.ceil(max(p1_small[0],p2_small[0],p3_small[0]))
+        x_max = math.ceil(max(p1_small[1],p2_small[1],p3_small[1]))
+        #y_max = math.ceil(max(p1_small[1],p2_small[1],p3_small[1]))
+        y_max = math.ceil(max(p1_small[0],p2_small[0],p3_small[0]))
         
         # if (indice_triangle == 2):
         #     print(p1,p2,p3)
         #     print(p1_small,p2_small,p3_small)
 
-        for i in range(x_min,x_max):
-            for j in range(y_min,y_max):
+        #for i in range(x_min,x_max):
+        for i in range(y_min,y_max):
+            for j in range(x_min,x_max):
                 if (already_visited[i][j] == False):
                     if (isintriangle(p1_small, p2_small, p3_small, [i,j])):
                         cond_img[i][j] = delta_perm[indice_triangle]
@@ -155,6 +160,7 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
         im_arr = ax[1].imshow(cond_img)
         ax[1].set_title('conductivity map')
         fig.colorbar(im_arr, ax=ax[1])
+        plt.gca().invert_yaxis()
         plt.show()
                 
     return cond_img
