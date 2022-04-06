@@ -7,6 +7,7 @@ Created on Wed Apr  6 10:43:25 2022
 
 import shutil
 import os 
+
 file_source = 'data/'
 voltage_file_destination = 'data/voltage_borders/class_images/'
 cond_file_detsination = 'data/conductivity_images/class_images/'
