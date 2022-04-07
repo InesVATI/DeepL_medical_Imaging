@@ -85,8 +85,8 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
     ymin, ymax = np.min(y), np.max(y)
     grad_x = (xmax-xmin)/nb_px
     grad_y = (ymax-ymin)/nb_px
-    print("Nb de pixels: ",str(nb_px) + 'x' + str(nb_px) + ' =',nb_px*nb_px)
-    print("Nb de triangle: ",tri.shape[0])
+    # print("Nb de pixels: ",str(nb_px) + 'x' + str(nb_px) + ' =',nb_px*nb_px)
+    # print("Nb de triangle: ",tri.shape[0])
     
     
     # for i in range(nb_px):
@@ -139,7 +139,7 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
 
         
     end2 = time.time()
-    print("Finding triangles: ",end2 - start2)
+    # print("Finding triangles: ",end2 - start2)
                     
                 
     
@@ -148,22 +148,22 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
     #parcourir les triangles puis pop les pixels            
                 
                 
-    if test:
-        fig, ax = plt.subplots(1,2, constrained_layout=True)
-        fig.set_size_inches(6, 4)
+    # if test:
+    #     fig, ax = plt.subplots(1,2, constrained_layout=True)
+    #     fig.set_size_inches(6, 4)
         
-        im=ax[0].tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
-        ax[0].set_aspect("equal")
-        ax[0].set_title('image from triangulation')
-        fig.colorbar(im, ax=ax[0])
+    #     im=ax[0].tripcolor(x, y, tri, np.real(delta_perm), shading="flat")
+    #     ax[0].set_aspect("equal")
+    #     ax[0].set_title('image from triangulation')
+    #     fig.colorbar(im, ax=ax[0])
         
-        im_arr = ax[1].imshow(cond_img)
-        ax[1].set_title('conductivity map')
-        fig.colorbar(im_arr, ax=ax[1])
-        plt.gca().invert_yaxis()
-        plt.show()
+    #     im_arr = ax[1].imshow(cond_img)
+    #     ax[1].set_title('conductivity map')
+    #     fig.colorbar(im_arr, ax=ax[1])
+    #     plt.gca().invert_yaxis()
+    #     plt.show()
                 
-    return cond_img
+    # return cond_img
 
 def label_data_rand(num, nb_px = 128, test=False):
     """"
@@ -257,10 +257,16 @@ def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
     np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
 
 def test(num=0):
-    start = time.time()
+    # start = time.time()
     label_data_rand(num, test=True)
-    end = time.time()
-    print("Execution time: ", end-start)
+    # end = time.time()
+    # print("Execution time: ", end-start)
     #label_data_sym(num, test=True)
+    
+def generation_data(nb_data):
+    for indice_generated_data in range(nb_data):
+        if(indice_generated_data%100 == 0):
+            print(indice_generated_data)
+        test(indice_generated_data)
     
     
