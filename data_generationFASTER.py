@@ -78,7 +78,7 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
     
     """
     
-    cond_img = -5000*np.ones((nb_px, nb_px))
+    cond_img = -5000*np.ones((nb_px, nb_px)) #the surrounding of the organ is set to -5000
 
     #graduation for pixelization of the image
     xmin, xmax = np.min(x), np.max(x)
@@ -163,7 +163,7 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
     #     plt.gca().invert_yaxis()
     #     plt.show()
                 
-    # return cond_img
+    return cond_img
 
 def label_data_rand(num, nb_px = 128, test=False):
     """"
@@ -179,8 +179,9 @@ def label_data_rand(num, nb_px = 128, test=False):
     
     #set the parameters of the random anomaly
     ray = (0.7-0.05)*rd.random() + 0.05 #RAY randomly between 0.04 and 0.7 
-
-    perm = (60000- 500)*rd.random() + 500
+    #perm = (60000- 500)*rd.random() + 500
+    #generate delta_perm between 0 and 1
+    perm = rd.random()+1
 
     
     #conductivity is equal to 1 every where
@@ -216,7 +217,7 @@ def label_data_rand(num, nb_px = 128, test=False):
 
     np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
     
-def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
+def label_data_sym(num, data='train', ray=0.1, perm=1000.0, test=False, nb_px = 128):
     """
     Labelization of data 
     --------------------
@@ -241,7 +242,7 @@ def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
     
     """ 1. Save the array containing the conductivity """
     cond_img = generate_array(nb_px, x, y, tri, delta_perm, test=test)
-    np.save('labeled_data/'+str(num)+'_cond_img', cond_img)
+    np.save('data_'+data+'/conductivity_images/class_images/'+str(num)+'_cond_img', cond_img)
     
     """ 2. FEM forward simulations """
     # setup EIT scan conditions
@@ -254,7 +255,7 @@ def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
     f0 = fwd.solve_eit(ex_mat, step=step, perm=mesh_obj["perm"])
     f1 = fwd.solve_eit(ex_mat, step=step, perm=mesh_new["perm"])
 
-    np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
+    np.save('data_'+data+'voltage_borders/class_images/'+str(num)+'_voltage_border',f1.v - f0.v)
 
 def test(num=0):
     # start = time.time()
