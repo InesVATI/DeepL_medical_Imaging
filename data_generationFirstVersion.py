@@ -14,8 +14,8 @@ from pyeit.mesh.shape import thorax
 import matplotlib.pyplot as plt
 
 import random as rd
+import time
 
-  
 def isintriangle(p1, p2, p3, p):
     """
     Enable to know either the point is inside the triangle defined by the vertices
@@ -105,7 +105,7 @@ def generate_array(nb_px, x, y, tri, delta_perm, test=False):
                 
     return cond_img
 
-def label_data_rand(num, nb_px = 128, test=False):
+def label_data_rand(num, data, nb_px = 128, test=False):
     """"
     Compute and save the conductivity map and the voltage at the borders
     For one anomaly that is randomly generated
@@ -141,7 +141,7 @@ def label_data_rand(num, nb_px = 128, test=False):
     
     """ 1. Save the array containing the conductivity """
     cond_img = generate_array(nb_px, x, y, tri, delta_perm, test)
-    np.save('labeled_data/'+str(num)+'_cond_img', cond_img)
+    np.save('data_'+data+'/conductivity_images/class_images/'+str(num)+'_cond_img', cond_img)
     
     """ 2. FEM forward simulations """
     # setup EIT scan conditions
@@ -154,7 +154,7 @@ def label_data_rand(num, nb_px = 128, test=False):
     f0 = fwd.solve_eit(ex_mat, step=step, perm=mesh_obj["perm"])
     f1 = fwd.solve_eit(ex_mat, step=step, perm=mesh_new["perm"])
 
-    np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
+    np.save('data_'+data+'/voltage_borders/class_images/'+str(num)+'_voltage_border',f1.v - f0.v)
     
 def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
     """
@@ -196,8 +196,9 @@ def label_data_sym(num, ray=0.1, perm=1000.0, test=False, nb_px = 128):
 
     np.save('labeled_data/'+str(num)+'_voltage_border',f1.v - f0.v)
 
-def test(num=0):
-    label_data_rand(num, test=True)
-    #label_data_sym(num, test=True)
     
-    
+start = time.time()
+label_data_rand(21601, 'train')
+print('ends in ', time.time()- start)
+c = np.load('data_train/conductivity_images/class_images/216001_cond_img.npy')
+plt.imshow(c)
